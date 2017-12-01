@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Sign Up</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#username").change(function(){
+                   console.log($(this).serialize()); 
+                   var password = document.getElementById("password").value;
+                   var password2 = document.getElementById("password2").value;
+                   console.log($("#email"));
+                   $.get("validateUserInput", $(this).serialize() + "&email=" + document.getElementById("email").value, function(data){  // ajax code :D
+                       if(!data.validUsername){
+                           $("#username-msg").text("Invalid username!");
+                           $("#submit-btn").attr('disabled','disabled');
+                       }else{
+                           $("#username-msg").text("");
+                       }    
+                       console.log(data);
+                       if(data.validUsername && data.validEmail && password == password2){
+                           $("#submit-btn").removeAttr('disabled');
+                       }
+                   });
+                });
+                $("#email").change(function(){
+                    $.get("validateUserInput", $(this).serialize() + "&username=" + document.getElementById("username").value, function(data){
+                       var password = document.getElementById("password").value;
+                       var password2 = document.getElementById("password2").value;
+                       console.log(data);
+                       if(!data.validEmail){
+                           $("#email-msg").text("Email already registered!");
+                           $("#submit-btn").attr('disabled', 'disabled');
+                       } else{
+                           $("#email-msg").text("");
+                       }
+                       if(data.validUsername && data.validEmail && password == password2){
+                           $("#submit-btn").removeAttr('disabled');
+                       }
+                    });
+                });
+                $("#password2").change(function() {
+                    console.log($("#password").value); // gives undefined for some reason
+                    var password = document.getElementById("password").value;
+                    var password2 = document.getElementById("password2").value;
+                    if (password != password2) {
+                        $("#password-msg").text("Password does not match!");
+                        $("#submit-btn").attr('disabled','disabled');
+                    }else {
+                        $("#password-msg").text("");   
+                    }
+                    $.get("validateUserInput", "&username=" + document.getElementById("username").value + 
+                           "&email=" + document.getElementById("email").value, function(data){
+                        console.log("PW: " + $(this).serialize());
+                        if(data.validUsername && data.validEmail && password == password2){
+                            $("#submit-btn").removeAttr('disabled');
+                        }
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <form action="signUp" method="post">
+            Name: <input type="text" name="name" required><br>
+            Username: <input type="text" name="username" id="username" required>
+            <span id="username-msg"></span><br>
+            Email: <input type="email" name="email" id="email" required>
+            <span id="email-msg"></span><br>
+            Password: <input type="password" name="password" id="password" required><br>
+            Re-enter Password: <input type="password" name="password2" id="password2" required>
+            <span id="password-msg"></span><br>
+            <input type="submit" value="Sign Up" id="submit-btn">
+        </form>
+    </body>
+</html>
